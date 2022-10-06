@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "module": "ESNext",
+    "target": "ES2022",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "plugins": [
+      {
+        "transform": "ts-nameof",
+        "type": "raw"
+      },
+      {
+        "transform": "ts-transformer-keys/transformer"
+      }
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "./*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "rollup.config.js"
+  ]
+}

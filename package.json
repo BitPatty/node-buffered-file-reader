@@ -1,0 +1,60 @@
+{
+  "name": "@bitpatty/ts-library-template",
+  "version": "0.0.1",
+  "description": "Template repository for my typescript libraries",
+  "author": "Matteias Collet <matteias.collet@bluewin.ch>",
+  "type": "module",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/types/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "rimraf dist && rollup -c",
+    "deps:force-upgrade": "npm-check-updates -u && rm -rf node_modules && rm -f package-lock.json && npm i",
+    "docs": "typedoc src/index.ts",
+    "format": "prettier --write \"{src,test}/**/*.ts\" ",
+    "lint": "eslint --fix \"{test,src}/**/*.{js,ts}\"",
+    "test": "jest --verbose --runInBand --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BitPatty/ts-library-template.git"
+  },
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/BitPatty/ts-library-template/issues"
+  },
+  "files": [
+    "dist"
+  ],
+  "homepage": "https://github.com/BitPatty/ts-library-template#readme",
+  "devDependencies": {
+    "@types/jest": "29.1.1",
+    "@types/node": "18.8.2",
+    "@types/ts-nameof": "4.2.1",
+    "@typescript-eslint/eslint-plugin": "5.39.0",
+    "@typescript-eslint/parser": "5.39.0",
+    "eslint": "8.24.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-jest": "27.1.1",
+    "eslint-plugin-prettier": "4.2.1",
+    "npm-check-updates": "16.3.8",
+    "prettier": "2.7.1",
+    "rimraf": "3.0.2",
+    "rollup": "2.79.1",
+    "rollup-plugin-typescript2": "0.34.1",
+    "ts-jest": "29.0.3",
+    "ts-nameof": "5.0.0",
+    "ts-transformer-keys": "0.4.3",
+    "tslib": "2.4.0",
+    "ttypescript": "1.5.13",
+    "typedoc": "0.23.15",
+    "typescript": "4.8.4"
+  }
+}

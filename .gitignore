@@ -1,0 +1,14 @@
+# Dependencies
+node_modules
+
+# Config files
+.npmrc
+
+# Build
+dist
+
+# Generated
+.cache
+coverage
+docs
+*.logs

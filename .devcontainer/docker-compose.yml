@@ -1,0 +1,27 @@
+version: '3.7'
+
+networks:
+  ts-library-template-network:
+    name: ts-library-template-network
+    driver: bridge
+
+services:
+  application:
+    container_name: ts-library-template
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VARIANT: 18
+        USER_UID: 1000
+        USER_GID: 1000
+    networks:
+      - ts-library-template-network
+    volumes:
+      - ..:/workspace:cached
+      - ~/.ssh:/home/node/.ssh:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    user: node
+    env_file:
+      - ./workspace.env
