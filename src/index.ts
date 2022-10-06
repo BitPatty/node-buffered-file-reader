@@ -1,3 +1,8 @@
-const hello = 'Hello';
+import BufferedFileReader from './buffered-file-reader';
+import Configuration, { ReaderOptions } from './configuration';
 
-export default hello;
+const createReader = (filePath: string): AsyncGenerator<Buffer | null> =>
+  BufferedFileReader.create(filePath);
+
+export default createReader;
+export { BufferedFileReader, Configuration, ReaderOptions };
