@@ -5,14 +5,6 @@ import path, { dirname } from 'path';
 
 import typescript from 'rollup-plugin-typescript2';
 import ttypescript from 'ttypescript';
-import keysTransformer from 'ts-transformer-keys/transformer';
-
-const transformers = [
-  (service) => ({
-    before: [keysTransformer(service.getProgram())],
-    after: [],
-  }),
-];
 
 const createPackageJson = {
   writeBundle: (opts) => {
@@ -51,7 +43,6 @@ export default [
         typescript: ttypescript,
         tsconfig: 'tsconfig.build.json',
         useTsconfigDeclarationDir: true,
-        transformers,
         tsconfigOverride: {
           compilerOptions: {
             declaration: true,
