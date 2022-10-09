@@ -11,6 +11,7 @@ describe('Split', () => {
         async (trim: boolean) => {
           const buff = Buffer.alloc(0);
           const filePath = await createTmpFile(buff);
+
           const r = createReader(filePath, {
             separator: Separator.CRLF,
             chunkSize,
@@ -18,12 +19,8 @@ describe('Split', () => {
           });
 
           const chunks: Buffer[] = [];
-          let done = false;
-          do {
-            const c = await r.next();
-            if (!c.done) chunks.push(c.value);
-            else done = true;
-          } while (!done);
+          for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+            chunks.push(chunk.value);
 
           expect(chunks.length).toEqual(0);
         },
@@ -38,12 +35,8 @@ describe('Split', () => {
         });
 
         const chunks: Buffer[] = [];
-        let done = false;
-        do {
-          const c = await r.next();
-          if (!c.done) chunks.push(c.value);
-          else done = true;
-        } while (!done);
+        for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+          chunks.push(chunk.value);
 
         expect(chunks.length).toEqual(3);
         expect(chunks[0].toString()).toEqual('abc\r\n');
@@ -60,12 +53,8 @@ describe('Split', () => {
         });
 
         const chunks: Buffer[] = [];
-        let done = false;
-        do {
-          const c = await r.next();
-          if (!c.done) chunks.push(c.value);
-          else done = true;
-        } while (!done);
+        for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+          chunks.push(chunk.value);
 
         expect(chunks.length).toEqual(3);
         expect(chunks[0].toString()).toEqual('abc\r\n');
@@ -82,12 +71,8 @@ describe('Split', () => {
         });
 
         const chunks: Buffer[] = [];
-        let done = false;
-        do {
-          const c = await r.next();
-          if (!c.done) chunks.push(c.value);
-          else done = true;
-        } while (!done);
+        for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+          chunks.push(chunk.value);
 
         expect(chunks.length).toEqual(3);
         expect(chunks[0].toString()).toEqual('abc\r');
@@ -105,12 +90,8 @@ describe('Split', () => {
         });
 
         const chunks: Buffer[] = [];
-        let done = false;
-        do {
-          const c = await r.next();
-          if (!c.done) chunks.push(c.value);
-          else done = true;
-        } while (!done);
+        for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+          chunks.push(chunk.value);
 
         expect(chunks.length).toEqual(3);
         expect(chunks[0].toString()).toEqual('abc');
@@ -128,12 +109,8 @@ describe('Split', () => {
         });
 
         const chunks: Buffer[] = [];
-        let done = false;
-        do {
-          const c = await r.next();
-          if (!c.done) chunks.push(c.value);
-          else done = true;
-        } while (!done);
+        for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+          chunks.push(chunk.value);
 
         expect(chunks.length).toEqual(3);
         expect(chunks[0].toString()).toEqual('abc');
@@ -151,12 +128,8 @@ describe('Split', () => {
         });
 
         const chunks: Buffer[] = [];
-        let done = false;
-        do {
-          const c = await r.next();
-          if (!c.done) chunks.push(c.value);
-          else done = true;
-        } while (!done);
+        for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+          chunks.push(chunk.value);
 
         expect(chunks.length).toEqual(3);
         expect(chunks[0].toString()).toEqual('abc\r');

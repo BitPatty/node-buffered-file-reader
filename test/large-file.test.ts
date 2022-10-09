@@ -16,12 +16,8 @@ describe('Large File', () => {
     const r = createReader(filePath);
 
     let i = 0;
-    let done = false;
-    do {
-      const c = await r.next();
-      done = c.done === true;
-      if (!done) i++;
-    } while (!done);
+
+    for (let chunk = await r.next(); !chunk.done; chunk = await r.next()) i++;
 
     expect(i).toEqual(fileSize / 100);
   });
@@ -32,18 +28,11 @@ describe('Large File', () => {
     });
 
     let i = 0;
-    let done = false;
     let lastChunk: Buffer | null = null;
-    do {
-      const c = await r.next();
-
-      if (!c.done) {
-        lastChunk = c.value;
-        i++;
-      } else {
-        done = true;
-      }
-    } while (!done);
+    for (let chunk = await r.next(); !chunk.done; chunk = await r.next()) {
+      i++;
+      lastChunk = chunk.value;
+    }
 
     expect(i).toEqual(Math.ceil(fileSize / 3));
     expect(lastChunk?.length).toEqual(1);
@@ -58,16 +47,8 @@ describe('Large File', () => {
       chunkSize: 33,
     });
 
-    let done = false;
-    do {
-      const c = await r.next();
-
-      if (!c.done) {
-        buff = Buffer.concat([buff, c.value]);
-      } else {
-        done = true;
-      }
-    } while (!done);
+    for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+      buff = Buffer.concat([buff, chunk.value]);
 
     expect(buff.length).toEqual(fileContent.length);
     for (let i = 0; i < fileContent.length; i++)

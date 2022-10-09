@@ -61,6 +61,7 @@ class BufferedFileReader {
       let next: Buffer | null = null;
 
       do {
+        // Get the next chunk
         next = this.#configuration.separator
           ? await this.#readChunkToSeparator(
               this.#configuration.chunkSize,
@@ -72,10 +73,14 @@ class BufferedFileReader {
               this.#cursorPosition,
             );
 
+        // Done
         if (next == null) return null;
 
+        // Update the cursor position
+        // For the next iteration
         this.#cursorPosition += next.length;
 
+        // Trim the separator if necessary
         if (
           this.#configuration.separator &&
           this.#configuration.trimSeparator

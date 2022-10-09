@@ -1,6 +1,6 @@
 {
   "name": "@bitpatty/buffered-file-reader",
-  "version": "0.0.1-rc.2",
+  "version": "0.1.0",
   "description": "Template repository for my typescript libraries",
   "author": "Matteias Collet <matteias.collet@bluewin.ch>",
   "type": "module",
