@@ -17,7 +17,6 @@
   "scripts": {
     "build": "rimraf dist && rollup -c",
     "deps:force-upgrade": "npm-check-updates -u && rm -rf node_modules && rm -f package-lock.json && npm i",
-    "docs": "typedoc src/index.ts",
     "format": "prettier --write \"{src,test}/**/*.ts\" ",
     "lint": "eslint --fix \"{test,src}/**/*.{js,ts}\"",
     "test": "jest --verbose --runInBand --coverage"
@@ -53,7 +52,6 @@
     "ts-jest": "29.0.3",
     "tslib": "2.4.0",
     "ttypescript": "1.5.13",
-    "typedoc": "0.23.15",
     "typescript": "4.8.4"
   }
 }
