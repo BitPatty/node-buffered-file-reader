@@ -34,7 +34,7 @@
   ],
   "homepage": "https://github.com/BitPatty/buffered-file-reader#readme",
   "devDependencies": {
-    "@types/jest": "29.2.2",
+    "@types/jest": "29.2.3",
     "@types/node": "18.11.9",
     "@types/tmp": "0.2.3",
     "@typescript-eslint/eslint-plugin": "5.42.1",
