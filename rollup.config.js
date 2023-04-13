@@ -5,7 +5,6 @@ import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 import typescript from 'rollup-plugin-typescript2';
-import ttypescript from 'ttypescript';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -43,7 +42,6 @@ export default [
     ],
     plugins: [
       typescript({
-        typescript: ttypescript,
         tsconfig: 'tsconfig.build.json',
         useTsconfigDeclarationDir: true,
         tsconfigOverride: {
