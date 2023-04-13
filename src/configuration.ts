@@ -71,11 +71,24 @@ class Configuration {
   public readonly trimSeparator: boolean = false;
 
   public constructor(options: ReaderOptions) {
-    if (options.startOffset) this.startOffset = options.startOffset;
-    if (options.chunkSize) this.chunkSize = options.chunkSize;
-    if (options.separator) this.separator = options.separator;
-    if (options.separator && options.trimSeparator != null)
+    if (options.startOffset != null) this.startOffset = options.startOffset;
+    if (options.chunkSize != null) this.chunkSize = options.chunkSize;
+    if (options.separator != null) this.separator = options.separator;
+    if (options.separator != null && options.trimSeparator != null)
       this.trimSeparator = options.trimSeparator;
+
+    this.#validateConfig();
+  }
+
+  #validateConfig(): void {
+    if (this.startOffset < 0)
+      throw new Error(`Start offset must be >= 0, got ${this.startOffset}`);
+
+    if (this.chunkSize <= 0)
+      throw new Error(`Chunk Size must be > 0, got ${this.chunkSize}`);
+
+    if (this.separator && this.separator.length <= 0)
+      throw new Error(`Empty separator`);
   }
 }
 

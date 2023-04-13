@@ -16,7 +16,6 @@ describe('Large File', () => {
     const r = createReader(filePath);
 
     let i = 0;
-
     for (let chunk = await r.next(); !chunk.done; chunk = await r.next()) i++;
 
     expect(i).toEqual(fileSize / 100);

@@ -1,6 +1,7 @@
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { file } from 'tmp';
+import createReader, { ReaderOptions } from '../src';
 
 const getTestFilePath = (fileName: string): string =>
   join(__dirname, 'files', fileName);
@@ -18,6 +19,34 @@ const getError = async <TError>(call: () => unknown): Promise<TError> => {
   }
 };
 
+/**
+ * Runs the reader with the specified input string
+ *
+ * @param data    The input string
+ * @param config  The reader config
+ * @returns       The reader result
+ */
+const runReader = async (
+  data: string,
+  config: ReaderOptions,
+): Promise<Buffer[]> => {
+  const buff = Buffer.from(data);
+  const filePath = await createTmpFile(buff);
+  const r = createReader(filePath, config);
+
+  const chunks: Buffer[] = [];
+  for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+    chunks.push(chunk.value);
+
+  return chunks;
+};
+
+/**
+ * Creates a temporary file with the specified content
+ *
+ * @param data  The file's content
+ * @returns     The file path
+ */
 const createTmpFile = async (data: Buffer): Promise<string> => {
   const filePath = await new Promise<string>((resolve, reject) => {
     file((err, name) => {
@@ -30,4 +59,10 @@ const createTmpFile = async (data: Buffer): Promise<string> => {
   return filePath;
 };
 
-export { getTestFilePath, getError, NoErrorThrownError, createTmpFile };
+export {
+  getTestFilePath,
+  getError,
+  NoErrorThrownError,
+  createTmpFile,
+  runReader,
+};

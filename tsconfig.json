@@ -14,17 +14,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
+    "strictNullChecks": true
   },
-  "include": [
-    "src/**/*",
-    "test/**/*",
-    "./*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "rollup.config.js"
-  ]
+  "include": ["src/**/*", "test/**/*", "./*.ts"],
+  "exclude": ["node_modules", "dist", "rollup.config.js"]
 }
