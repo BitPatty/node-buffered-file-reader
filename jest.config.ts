@@ -8,5 +8,6 @@ export default (): Config.InitialOptions => {
     setupFilesAfterEnv: ['./jest.setup.ts'],
     verbose: true,
     testMatch: ['**/*.test.ts'],
+    coveragePathIgnorePatterns: ['test/**/*.ts'],
   };
 };
