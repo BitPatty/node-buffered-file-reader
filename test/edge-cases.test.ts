@@ -25,49 +25,61 @@ describe('Edge Cases', () => {
     ]);
   });
 
-  test('Separator Greater Than Input Returns Input', async () => {
-    await expect(
-      runReader('abc', { separator: new Uint8Array([1, 2, 3, 4, 5]) }),
-    ).resolves.toMatchChunks(['abc']);
-  });
-
-  test('Separator Greater Than Chunk Size Continues Reading Chunks', async () => {
-    await expect(
-      runReader(LONG_STRING, {
-        separator: new Uint8Array(Buffer.from('abcabcabc')),
-        chunkSize: 3,
-      }),
-    ).resolves.toMatchChunks([...new Array(411).fill('abcabcabc'), 'abc']);
-  });
-
-  test('Partial Separator Match Continues Reading', async () => {
-    await expect(
-      runReader(LONG_STRING, {
-        separator: new Uint8Array(Buffer.from('abcd')),
-        chunkSize: 3,
-      }),
-    ).resolves.toMatchChunks([LONG_STRING]);
-  });
-
-  test('Long Input With Non Present Separator Returns Input', async () => {
-    await expect(
-      runReader(LONG_STRING, {
-        separator: Separator.NULL_TERMINATOR,
-      }),
-    ).resolves.toMatchChunks([LONG_STRING]);
-  });
-
   test('Empty File Returns Empty Chunk', async () => {
     const r = createReader(filePath);
     const c = await r.next();
     expect(c.done).toBe(true);
   });
 
-  test('Empty File With Separator Returns Empty Chunkk', async () => {
-    const r = createReader(filePath, {
-      separator: new Uint8Array([0x00]),
+  describe.each([[true], [false]])('With Trim: %s', (trimSeparator) => {
+    test('Separator Greater Than Input Returns Input', async () => {
+      await expect(
+        runReader('abc', {
+          separator: new Uint8Array([1, 2, 3, 4, 5]),
+          trimSeparator,
+        }),
+      ).resolves.toMatchChunks(['abc']);
     });
-    const c = await r.next();
-    expect(c.done).toBe(true);
+
+    test('Separator Greater Than Chunk Size Continues Reading Chunks', async () => {
+      await expect(
+        runReader(LONG_STRING, {
+          separator: new Uint8Array(Buffer.from('abcabcabc')),
+          chunkSize: 3,
+          trimSeparator,
+        }),
+      ).resolves.toMatchChunks([
+        ...new Array(411).fill(trimSeparator ? '' : 'abcabcabc'),
+        'abc',
+      ]);
+    });
+
+    test('Partial Separator Match Continues Reading', async () => {
+      await expect(
+        runReader(LONG_STRING, {
+          separator: new Uint8Array(Buffer.from('abcd')),
+          chunkSize: 3,
+          trimSeparator,
+        }),
+      ).resolves.toMatchChunks([LONG_STRING]);
+    });
+
+    test('Long Input With Non Present Separator Returns Input', async () => {
+      await expect(
+        runReader(LONG_STRING, {
+          separator: Separator.NULL_TERMINATOR,
+          trimSeparator,
+        }),
+      ).resolves.toMatchChunks([LONG_STRING]);
+    });
+
+    test('Empty File With Separator Returns Empty Chunkk', async () => {
+      const r = createReader(filePath, {
+        separator: new Uint8Array([0x00]),
+        trimSeparator,
+      });
+      const c = await r.next();
+      expect(c.done).toBe(true);
+    });
   });
 });
