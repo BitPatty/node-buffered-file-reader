@@ -45,7 +45,7 @@ describe('Edge Cases', () => {
       await expect(
         runReader(LONG_STRING, {
           separator: new Uint8Array(Buffer.from('abcabcabc')),
-          chunkSize: 3,
+          chunkSize: 2,
           trimSeparator,
         }),
       ).resolves.toMatchChunks([
@@ -58,7 +58,7 @@ describe('Edge Cases', () => {
       await expect(
         runReader(LONG_STRING, {
           separator: new Uint8Array(Buffer.from('abcd')),
-          chunkSize: 3,
+          chunkSize: 2,
           trimSeparator,
         }),
       ).resolves.toMatchChunks([LONG_STRING]);
