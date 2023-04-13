@@ -25,6 +25,30 @@ describe('Edge Cases', () => {
     ]);
   });
 
+  test('Separator Greater Than Input Returns Input', async () => {
+    await expect(
+      runReader('abc', { separator: new Uint8Array([1, 2, 3, 4, 5]) }),
+    ).resolves.toMatchChunks(['abc']);
+  });
+
+  test('Separator Greater Than Chunk Size Continues Reading Chunks', async () => {
+    await expect(
+      runReader(LONG_STRING, {
+        separator: new Uint8Array(Buffer.from('abcabcabc')),
+        chunkSize: 3,
+      }),
+    ).resolves.toMatchChunks([...new Array(411).fill('abcabcabc'), 'abc']);
+  });
+
+  test('Partial Separator Match Continues Reading', async () => {
+    await expect(
+      runReader(LONG_STRING, {
+        separator: new Uint8Array(Buffer.from('abcd')),
+        chunkSize: 3,
+      }),
+    ).resolves.toMatchChunks([LONG_STRING]);
+  });
+
   test('Long Input With Non Present Separator Returns Input', async () => {
     await expect(
       runReader(LONG_STRING, {
