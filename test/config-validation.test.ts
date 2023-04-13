@@ -34,4 +34,18 @@ describe('Configuration Validation', () => {
       ).not.toThrow();
     });
   });
+
+  describe('Chunk Size', () => {
+    test('Negative Throws', () => {
+      expect(() => createReader(filePath, { chunkSize: -1 })).toThrow();
+    });
+
+    test('Zero Throws', () => {
+      expect(() => createReader(filePath, { chunkSize: 0 })).toThrow();
+    });
+
+    test('Positive Does Not Throw', () => {
+      expect(() => createReader(filePath, { chunkSize: 1 })).not.toThrow();
+    });
+  });
 });
