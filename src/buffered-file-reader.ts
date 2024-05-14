@@ -1,7 +1,7 @@
+import { watchFile, unwatchFile, StatsListener } from 'fs';
 import { FileHandle, open } from 'fs/promises';
 
 import { Configuration, ReaderOptions } from './configuration';
-import { watchFile, unwatchFile, StatsListener } from 'fs';
 
 export type IteratorResult = {
   /**

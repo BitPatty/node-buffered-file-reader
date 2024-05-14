@@ -53,6 +53,6 @@ export default [
       }),
       createPackageJson,
     ],
-    external: ['fs/promises'],
+    external: ['fs/promises', 'fs'],
   },
 ];
