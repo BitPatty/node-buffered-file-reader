@@ -41,6 +41,7 @@ type IteratorResult = {
      * position has been read into the current data buffer.
      */
     start: number;
+
     /**
      * The cursor position at the end of where the last chunk of
      * the current buffer was read.
@@ -50,6 +51,15 @@ type IteratorResult = {
      */
     end: number;
   };
+
+  /**
+   * Peeks at the next data buffer following the result of this
+   * iteration without moving the cursor forward.
+   *
+   * @returns  The next data buffer
+   */
+  peekNext: () => Promise<Omit<IteratorResult, 'peekNext'> | null>;
+
   /**
    * The data in the current chunk
    */

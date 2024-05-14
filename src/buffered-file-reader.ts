@@ -18,6 +18,7 @@ export type IteratorResult = {
      * position has been read into the current data buffer.
      */
     start: number;
+
     /**
      * The cursor position at the end of where the last chunk of
      * the current buffer was read.
@@ -27,6 +28,15 @@ export type IteratorResult = {
      */
     end: number;
   };
+
+  /**
+   * Peeks at the next data buffer following the result of this
+   * iteration without moving the cursor forward.
+   *
+   * @returns  The next data buffer
+   */
+  peekNext: () => Promise<Omit<IteratorResult, 'peekNext'> | null>;
+
   /**
    * The data in the current chunk
    */
@@ -126,23 +136,14 @@ export class BufferedFileReader {
         const startingCursorPosition = this.#cursorPosition;
 
         // Get the next chunk
-        next = this.#configuration.separator
-          ? await this.#readChunkToSeparator(
-              this.#configuration.chunkSize,
-              this.#configuration.separator,
-              this.#cursorPosition,
-            )
-          : await this.#readChunk(
-              this.#configuration.chunkSize,
-              this.#cursorPosition,
-            );
+        next = await this.#readChunkAtOffset(this.#cursorPosition);
 
         // Done
         if (next == null) return null;
 
-        // Update the cursor position
-        // For the next iteration
-        this.#cursorPosition += next.length;
+        // Update the cursor position for the next iteration
+        const nextStartingCursorPosition = this.#cursorPosition + next.length;
+        this.#cursorPosition = nextStartingCursorPosition;
 
         // Trim the separator if necessary
         if (
@@ -159,6 +160,21 @@ export class BufferedFileReader {
             end: this.#cursorPosition,
           },
           data: next,
+          peekNext: async () => {
+            const peekChunk = await this.#readChunkAtOffset(
+              nextStartingCursorPosition,
+            );
+
+            if (!peekChunk) return null;
+
+            return {
+              chunkCursor: {
+                start: nextStartingCursorPosition,
+                end: nextStartingCursorPosition + peekChunk.length,
+              },
+              data: peekChunk,
+            };
+          },
         };
       } while (next != null);
     } finally {
@@ -171,6 +187,24 @@ export class BufferedFileReader {
     }
 
     return null;
+  }
+
+  /**
+   * Reads the next chunk with the current configuration
+   * at the specified starting position
+   *
+   * @param startOffset  The offset from which to start reading
+   * @returns            The next chunk
+   */
+  #readChunkAtOffset(startOffset: number): Promise<Buffer | null> {
+    if (this.#configuration.separator)
+      return this.#readChunkToSeparator(
+        this.#configuration.chunkSize,
+        this.#configuration.separator,
+        startOffset,
+      );
+
+    return this.#readChunk(this.#configuration.chunkSize, startOffset);
   }
 
   /**
