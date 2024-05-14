@@ -1,9 +1,10 @@
 import { assert } from 'console';
 import { statSync } from 'fs';
 
-import createReader, { Separator } from '../src';
+import createReader, { BufferedFileReader, Separator } from '../src';
 
-import { getTestFilePath, runReader } from './test-utils';
+import { createTmpFile, getTestFilePath, runReader } from './test-utils';
+import { unlink, writeFile } from 'fs/promises';
 
 const LONG_STRING = new Array(1234).fill('abc').join('');
 
@@ -81,5 +82,42 @@ describe('Edge Cases', () => {
       const c = await r.next();
       expect(c.done).toBe(true);
     });
+  });
+
+  test('Continues On File Shortening', async () => {
+    const tempFile = await createTmpFile(Buffer.from('abcdef'));
+    const reader = BufferedFileReader.create(tempFile, {
+      chunkSize: 1,
+      throwOnFileModification: false,
+    });
+
+    await reader.next();
+    await reader.next();
+    await reader.next();
+
+    await writeFile(tempFile, 'a');
+    await expect(reader.next()).resolves.toMatchObject({
+      done: true,
+      value: null,
+    });
+  });
+
+  // Note: this case not throwing is expected behaviour as only
+  // the link is deleted and not the file itself
+  test('Continues Mid-Procssing File Deletion', async () => {
+    const tempFile = await createTmpFile(Buffer.from('abcdef'));
+    const reader = BufferedFileReader.create(tempFile, {
+      chunkSize: 1,
+      throwOnFileModification: false,
+    });
+
+    await reader.next();
+    await unlink(tempFile);
+
+    await expect(reader.next()).resolves.toMatchObject({
+      value: { chunkCursor: { start: 1, end: 2 } },
+    });
+
+    await reader.return(null);
   });
 });

@@ -48,4 +48,30 @@ describe('Configuration Validation', () => {
       expect(() => createReader(filePath, { chunkSize: 1 })).not.toThrow();
     });
   });
+
+  describe('Modification Watcher Poll Interval', () => {
+    test('Negative Throws', () => {
+      expect(() =>
+        createReader(filePath, { fileModificationPollInterval: -1 }),
+      ).toThrow();
+    });
+
+    test('Zero Throws', () => {
+      expect(() =>
+        createReader(filePath, { fileModificationPollInterval: 0 }),
+      ).toThrow();
+    });
+
+    test('Less Than 10 Throws', () => {
+      expect(() =>
+        createReader(filePath, { fileModificationPollInterval: 9 }),
+      ).toThrow();
+    });
+
+    test('>= 10 Does Not Throw', () => {
+      expect(() =>
+        createReader(filePath, { fileModificationPollInterval: 10 }),
+      ).not.toThrow();
+    });
+  });
 });

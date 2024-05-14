@@ -44,6 +44,26 @@ const runReader = async (
 };
 
 /**
+ * Runs the reader with the specified input file
+ *
+ * @param filePath  The file path
+ * @param config    The reader config
+ * @returns         The reader result
+ */
+const runFileReader = async (
+  filePath: string,
+  config: ReaderOptions,
+): Promise<IteratorResult[]> => {
+  const r = createReader(filePath, config);
+
+  const chunks: IteratorResult[] = [];
+  for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
+    chunks.push(chunk.value);
+
+  return chunks;
+};
+
+/**
  * Creates a temporary file with the specified content
  *
  * @param data  The file's content
@@ -67,4 +87,5 @@ export {
   NoErrorThrownError,
   createTmpFile,
   runReader,
+  runFileReader,
 };

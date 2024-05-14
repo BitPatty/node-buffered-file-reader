@@ -12,3 +12,7 @@ dist
 coverage
 docs
 *.logs
+
+# Temporary files
+/test.mjs
+/test.cjs

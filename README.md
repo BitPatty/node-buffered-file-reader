@@ -21,6 +21,8 @@ for (
 }
 ```
 
+### Chunk Value
+
 The chunk value is passed in the format below - whereas `Buffer` is a [`NodeJS Buffer`](https://nodejs.org/api/buffer.html). The typing of the iterator and its result can also be imported from the library as follows: `import { Iterator, IteratorResult } from '@bitpatty/buffered-file-reader'`. Note: There is a builtin `IteratorResult` type in NodeJS, make sure you import it from the library if you intend to use it.
 
 ```typescript
@@ -55,6 +57,8 @@ type IteratorResult = {
 };
 ```
 
+### End of file
+
 To know whether the reader reached the end of the file (no more to read), you can either check whether the value is `null` or whether the `done` flag is set:
 
 ```typescript
@@ -64,6 +68,23 @@ if (chunkA.value == null) console.log('done');
 // .. or ..
 const chunkA = await reader.next();
 if (chunkA.done) console.log('done');
+```
+
+### Exiting early
+
+> Note: If you don't read the whole file you should always call the return function to close the open handles.
+
+If you want to stop further reads you can call `return` on the reader:
+
+```typescript
+import createReader from '@bitpatty/buffered-file-reader';
+
+// Create the reader instance for the target file
+const reader = createReader('path-to-your-file');
+
+// ...
+
+reader.return(null);
 ```
 
 ## Configuration Options
@@ -91,6 +112,32 @@ The following options can be passed as second argument when instantiating the re
   //
   // Defaults to `100`
   chunkSize: 100;
+
+  //
+  // Whether to fail if the file is modified while its being
+  // processed by the file reader.
+  //
+  // If set to `true`, the file will be tracked for changes
+  // by `watchFile`. If any changes are done to the file
+  // the following read will throw an error.
+  //
+  // See: https://nodejs.org/docs/latest/api/fs.html#fs_fs_watchfile_filename_options_listener
+  //
+  // Defaults to `true`.
+  //
+  throwOnFileModification: boolean;
+
+  // The interval of file modification checks in milliseconds.
+  //
+  // The interval specifies at which rate the file stats should
+  // be checked for any modifications.
+  //
+  // Note that the actual detection frequency is still relying
+  // on the NodeJS file watcher.
+  //
+  // Defaults to `1000`
+  //
+  fileModificationPollInterval: number;
 
   // The byte pattern to identify the end of a section.
   //

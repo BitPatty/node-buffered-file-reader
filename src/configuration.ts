@@ -24,6 +24,35 @@ export type ReaderOptions =
        * Defaults to `100`
        */
       chunkSize?: number;
+
+      /**
+       * Whether to fail if the file is modified while its being
+       * processed by the file reader.
+       *
+       * If set to `true`, the file will be tracked for changes
+       * by `watchFile`. If any changes are done to the file
+       * the following read will throw an error.
+       *
+       * See: https://nodejs.org/docs/latest/api/fs.html#fs_fs_watchfile_filename_options_listener
+       *
+       * Note that
+       *
+       * Defaults to `true`.
+       */
+      throwOnFileModification?: boolean;
+
+      /**
+       * The interval of file modification checks in milliseconds.
+       *
+       * The interval specifies at which rate the file stats should
+       * be checked for any modifications.
+       *
+       * Note that the actual detection frequency is still relying
+       * on the NodeJS file watcher.
+       *
+       * Defaults to `1000`
+       */
+      fileModificationPollInterval?: number;
     } & (
       | {
           /**
@@ -86,6 +115,15 @@ export class Configuration {
    * Whether to trim the separator from the data buffer
    */
   public readonly trimSeparator: boolean = false;
+  /**
+   * Whether to throw if the file is modified during processing
+   */
+  public readonly throwOnFileModification: boolean = true;
+
+  /**
+   * The interval for file modification polls
+   */
+  public readonly fileModificationPollInterval: number = 1000;
 
   /**
    * Creates a new configuration instance
@@ -96,8 +134,15 @@ export class Configuration {
     if (options.startOffset != null) this.startOffset = options.startOffset;
     if (options.chunkSize != null) this.chunkSize = options.chunkSize;
     if (options.separator != null) this.separator = options.separator;
+
     if (options.separator != null && options.trimSeparator != null)
       this.trimSeparator = options.trimSeparator;
+
+    if (options.throwOnFileModification === false)
+      this.throwOnFileModification = false;
+
+    if (options.fileModificationPollInterval != null)
+      this.fileModificationPollInterval = options.fileModificationPollInterval;
 
     this.#validateConfig();
   }
@@ -113,6 +158,11 @@ export class Configuration {
       throw new Error(`Chunk Size must be > 0, got ${this.chunkSize}`);
 
     if (this.separator && this.separator.length <= 0)
-      throw new Error(`Empty separator`);
+      throw new Error(`Empty separator supplied`);
+
+    if (this.fileModificationPollInterval < 10)
+      throw new Error(
+        `Invalid file modification poll interval, must be at least 10, got ${this.fileModificationPollInterval}`,
+      );
   }
 }

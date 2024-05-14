@@ -1,5 +1,11 @@
 import { IteratorResult } from './src';
 
+/**
+ * Set the timeout for all jest tests
+ * and hooks to two minutes
+ */
+jest.setTimeout(120000);
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {

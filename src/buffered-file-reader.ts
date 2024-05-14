@@ -1,6 +1,7 @@
 import { FileHandle, open } from 'fs/promises';
 
 import { Configuration, ReaderOptions } from './configuration';
+import { watchFile, unwatchFile, StatsListener } from 'fs';
 
 export type IteratorResult = {
   /**
@@ -32,7 +33,7 @@ export type IteratorResult = {
   data: Buffer;
 };
 
-export type Iterator = AsyncGenerator<IteratorResult, null, IteratorResult>;
+export type Iterator = AsyncGenerator<IteratorResult, null, undefined>;
 
 export class BufferedFileReader {
   /**
@@ -46,9 +47,24 @@ export class BufferedFileReader {
   readonly #filePath: string;
 
   /**
+   * Whether the reader has already been started
+   */
+  #isStarted: boolean;
+
+  /**
    * The file handle
    */
   #handle: FileHandle | undefined;
+
+  /**
+   * The watcher for file modifications
+   */
+  #fileModificationWatcher: StatsListener | undefined;
+
+  /**
+   * Whether the file has been modified
+   */
+  #hasFileBeenModified: boolean | undefined;
 
   /**
    * The current position of the file cursor
@@ -85,11 +101,27 @@ export class BufferedFileReader {
    * @returns  The iterator
    */
   public async *start(): Iterator {
+    if (this.#isStarted) throw new Error(`Reader already started`);
+    this.#isStarted = true;
+
+    if (this.#configuration.throwOnFileModification)
+      this.#startModificationWatcher();
+
     try {
       if (!this.#handle) await this.#openFileHandle();
+      this.#mapExitHandlers();
       let next: Buffer | null = null;
 
       do {
+        // Ensure there haven't been any modifications
+        if (
+          this.#configuration.throwOnFileModification &&
+          this.#hasFileBeenModified
+        )
+          throw new Error(
+            `File '${this.#filePath}' has been modified while processing`,
+          );
+
         // The starting position of the cursor
         const startingCursorPosition = this.#cursorPosition;
 
@@ -130,7 +162,12 @@ export class BufferedFileReader {
         };
       } while (next != null);
     } finally {
-      await this.#closeFileHandle();
+      // Finally is called in the following events:
+      // - The return above is called
+      // - The return() is called manually
+      // - The above code throws
+      // - The throw() is called manually
+      await this.#dispose();
     }
 
     return null;
@@ -256,6 +293,54 @@ export class BufferedFileReader {
   }
 
   /**
+   * Maps the processes process exit handlers, making sure
+   * that open handles are closed properly
+   */
+  #mapExitHandlers(): void {
+    process.on('exit', async () => {
+      await this.#dispose();
+      process.exit();
+    });
+
+    process.on('SIGINT', async () => {
+      await this.#dispose();
+      process.exit();
+    });
+
+    process.on('SIGTERM', async () => {
+      await this.#dispose();
+      process.exit();
+    });
+  }
+
+  /**
+   * Starts the modification watcher, setting the #hasFileBeenModified
+   * flag whenever there is a modification to the file.
+   */
+  #startModificationWatcher(): void {
+    if (this.#fileModificationWatcher)
+      throw new Error(`Modification watcher already registerd`);
+
+    this.#fileModificationWatcher = (curr, next) => {
+      if (curr.mtimeMs !== next.mtimeMs) this.#hasFileBeenModified = true;
+    };
+
+    watchFile(
+      this.#filePath,
+      { interval: this.#configuration.fileModificationPollInterval },
+      this.#fileModificationWatcher,
+    );
+  }
+
+  /**
+   * Stops the modification watcher if it has been started.
+   */
+  #stopModificationWatcher(): void {
+    if (!this.#fileModificationWatcher) return;
+    unwatchFile(this.#filePath, this.#fileModificationWatcher);
+  }
+
+  /**
    * Opens the file handle
    */
   async #openFileHandle(): Promise<void> {
@@ -270,5 +355,10 @@ export class BufferedFileReader {
     if (this.#handle == null) return;
     await this.#handle.close();
     this.#handle = undefined;
+  }
+
+  async #dispose(): Promise<void> {
+    this.#stopModificationWatcher();
+    await this.#closeFileHandle();
   }
 }
