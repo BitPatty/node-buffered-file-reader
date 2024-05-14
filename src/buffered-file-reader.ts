@@ -1,8 +1,40 @@
 import { FileHandle, open } from 'fs/promises';
 
-import Configuration, { ReaderOptions } from './configuration';
+import { Configuration, ReaderOptions } from './configuration';
 
-class BufferedFileReader {
+export type IteratorResult = {
+  /**
+   * The state of the chunk cursor for this data buffer.
+   *
+   * Note: Indexing starts at 0
+   */
+  chunkCursor: {
+    /**
+     * The cursor position at the start of where the initial chunk
+     * of the current buffer was read.
+     *
+     * This number is inclusive, meaning that the byte at this
+     * position has been read into the current data buffer.
+     */
+    start: number;
+    /**
+     * The cursor position at the end of where the last chunk of
+     * the current buffer was read.
+     *
+     * This number is exclusive, meaning the the byte at this
+     * position has not been read into the current data buffer.
+     */
+    end: number;
+  };
+  /**
+   * The data in the current chunk
+   */
+  data: Buffer;
+};
+
+export type Iterator = AsyncGenerator<IteratorResult, null, IteratorResult>;
+
+export class BufferedFileReader {
   /**
    * The reader configuration
    */
@@ -42,10 +74,7 @@ class BufferedFileReader {
    * @param options   The reader options
    * @returns         The file reader
    */
-  public static create(
-    filePath: string,
-    options?: ReaderOptions,
-  ): AsyncGenerator<Buffer, null, Buffer> {
+  public static create(filePath: string, options?: ReaderOptions): Iterator {
     const config = new Configuration(options ?? {});
     return new BufferedFileReader(filePath, config).start();
   }
@@ -55,12 +84,15 @@ class BufferedFileReader {
    *
    * @returns  The iterator
    */
-  public async *start(): AsyncGenerator<Buffer, null, Buffer> {
+  public async *start(): Iterator {
     try {
       if (!this.#handle) await this.#openFileHandle();
       let next: Buffer | null = null;
 
       do {
+        // The starting position of the cursor
+        const startingCursorPosition = this.#cursorPosition;
+
         // Get the next chunk
         next = this.#configuration.separator
           ? await this.#readChunkToSeparator(
@@ -88,7 +120,14 @@ class BufferedFileReader {
           next = this.#trimSeparator(next, this.#configuration.separator);
         }
 
-        yield next;
+        // Yield the current entry
+        yield {
+          chunkCursor: {
+            start: startingCursorPosition,
+            end: this.#cursorPosition,
+          },
+          data: next,
+        };
       } while (next != null);
     } finally {
       await this.#closeFileHandle();
@@ -233,5 +272,3 @@ class BufferedFileReader {
     this.#handle = undefined;
   }
 }
-
-export default BufferedFileReader;

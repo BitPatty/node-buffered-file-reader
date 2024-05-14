@@ -4,7 +4,7 @@ import { createTmpFile, runReader } from './test-utils';
 
 const CHUNK_SIZES = new Array(20).fill(null).map((_, idx) => [idx + 1]);
 
-describe('Split', () => {
+describe('Separator Split', () => {
   describe.each(CHUNK_SIZES)('Chunk Size %i', (chunkSize: number) => {
     test.each([[true, false]])(
       'Empty Buffer Returns Empty Buffer (Trimmed: %b)',
@@ -20,7 +20,7 @@ describe('Split', () => {
 
         const chunks: Buffer[] = [];
         for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
-          chunks.push(chunk.value);
+          chunks.push(chunk.value.data);
 
         expect(chunks.length).toEqual(0);
       },

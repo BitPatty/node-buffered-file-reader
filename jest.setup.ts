@@ -1,3 +1,5 @@
+import { IteratorResult } from './src';
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
@@ -10,10 +12,10 @@ declare global {
 
 expect.extend({
   toMatchChunks(
-    received: Buffer[],
+    received: IteratorResult[],
     expected: string[],
   ): jest.CustomMatcherResult {
-    const a = received.map((c) => c.toString('hex')).join('-');
+    const a = received.map((c) => c.data.toString('hex')).join('-');
     const b = expected.map((e) => Buffer.from(e).toString('hex')).join('-');
 
     const isMatch = a === b;

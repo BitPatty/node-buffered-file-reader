@@ -1,10 +1,13 @@
 /**
  * The options for the buffered reader
  */
-type ReaderOptions =
+export type ReaderOptions =
   | {
       /**
-       * The offset (in bytes) from which to start reading the file
+       * The offset (in bytes) from which to start reading the file.
+       *
+       * If set to a number greater than 0, that number of bytes
+       * will be skipped when reading the first chunk.
        */
       startOffset?: number;
 
@@ -64,12 +67,31 @@ type ReaderOptions =
         }
     );
 
-class Configuration {
+export class Configuration {
+  /**
+   * The start offset of the first read operation in bytes
+   */
   public readonly startOffset: number = 0;
+  /**
+   * The separator up to which chunks should be read into
+   * the current data buffer
+   */
   public readonly separator: Uint8Array | null = null;
+  /**
+   * The size of a chunk to read from the source file on each
+   * read operation.
+   */
   public readonly chunkSize: number = 100;
+  /**
+   * Whether to trim the separator from the data buffer
+   */
   public readonly trimSeparator: boolean = false;
 
+  /**
+   * Creates a new configuration instance
+   *
+   * @param options  The configuration options
+   */
   public constructor(options: ReaderOptions) {
     if (options.startOffset != null) this.startOffset = options.startOffset;
     if (options.chunkSize != null) this.chunkSize = options.chunkSize;
@@ -80,6 +102,9 @@ class Configuration {
     this.#validateConfig();
   }
 
+  /**
+   * Validates the configuration values
+   */
   #validateConfig(): void {
     if (this.startOffset < 0)
       throw new Error(`Start offset must be >= 0, got ${this.startOffset}`);
@@ -91,6 +116,3 @@ class Configuration {
       throw new Error(`Empty separator`);
   }
 }
-
-export default Configuration;
-export { ReaderOptions };

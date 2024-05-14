@@ -1,7 +1,9 @@
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { file } from 'tmp';
+
 import createReader, { ReaderOptions } from '../src';
+import { IteratorResult } from '../src/buffered-file-reader';
 
 const getTestFilePath = (fileName: string): string =>
   join(__dirname, 'files', fileName);
@@ -29,12 +31,12 @@ const getError = async <TError>(call: () => unknown): Promise<TError> => {
 const runReader = async (
   data: string,
   config: ReaderOptions,
-): Promise<Buffer[]> => {
+): Promise<IteratorResult[]> => {
   const buff = Buffer.from(data);
   const filePath = await createTmpFile(buff);
   const r = createReader(filePath, config);
 
-  const chunks: Buffer[] = [];
+  const chunks: IteratorResult[] = [];
   for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
     chunks.push(chunk.value);
 

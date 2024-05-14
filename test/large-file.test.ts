@@ -30,7 +30,7 @@ describe('Large File', () => {
     let lastChunk: Buffer | null = null;
     for (let chunk = await r.next(); !chunk.done; chunk = await r.next()) {
       i++;
-      lastChunk = chunk.value;
+      lastChunk = chunk.value.data;
     }
 
     expect(i).toEqual(Math.ceil(fileSize / 3));
@@ -47,7 +47,7 @@ describe('Large File', () => {
     });
 
     for (let chunk = await r.next(); !chunk.done; chunk = await r.next())
-      buff = Buffer.concat([buff, chunk.value]);
+      buff = Buffer.concat([buff, chunk.value.data]);
 
     expect(buff.length).toEqual(fileContent.length);
     for (let i = 0; i < fileContent.length; i++)
