@@ -258,9 +258,9 @@ The following snippet reads a binary file byte-by-byte
 // my-file.bin:
 // 0x0011
 
-import createReader, { Separator } from '@bitpatty/buffered-file-reader';
+import createReader from '@bitpatty/buffered-file-reader';
 
-const reader = createReader('my-file.txt', { chnkSize: 1 });
+const reader = createReader('my-file.txt', { chunkSize: 1 });
 
 const byte1 = await reader.next();
 const byte2 = await reader.next();
