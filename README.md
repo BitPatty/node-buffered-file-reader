@@ -256,7 +256,7 @@ The following snippet reads a binary file byte-by-byte
 
 ```typescript
 // my-file.bin:
-// 0x001122
+// 0x0011
 
 import createReader, { Separator } from '@bitpatty/buffered-file-reader';
 
