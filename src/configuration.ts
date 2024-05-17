@@ -100,20 +100,24 @@ export class Configuration {
    * The start offset of the first read operation in bytes
    */
   public readonly startOffset: number = 0;
+
   /**
    * The separator up to which chunks should be read into
    * the current data buffer
    */
   public readonly separator: Uint8Array | null = null;
+
   /**
    * The size of a chunk to read from the source file on each
    * read operation.
    */
   public readonly chunkSize: number = 100;
+
   /**
    * Whether to trim the separator from the data buffer
    */
   public readonly trimSeparator: boolean = false;
+
   /**
    * Whether to throw if the file is modified during processing
    */

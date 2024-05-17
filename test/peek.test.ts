@@ -25,6 +25,31 @@ describe('Peek', () => {
     await reader.return(null);
   });
 
+  test('Peek With Separator Matches Next', async () => {
+    const tempFile = await createTmpFile(Buffer.from('abcadefghi'));
+    const reader = BufferedFileReader.create(tempFile, {
+      chunkSize: 5,
+      separator: Buffer.from('a'),
+      trimSeparator: true,
+    });
+
+    const current = await reader.next();
+    const peek = await current.value?.peekNext();
+    const next = await reader.next();
+
+    expect(peek).toBeDefined();
+
+    expect({
+      chunkCursor: peek?.chunkCursor,
+      data: next.value?.data.toString(),
+    }).toMatchObject({
+      chunkCursor: next.value?.chunkCursor,
+      data: next.value?.data.toString(),
+    });
+
+    await reader.return(null);
+  });
+
   test('Peek Remembers Cusor Position', async () => {
     const tempFile = await createTmpFile(Buffer.from('abcdefghijklmnopqrst'));
     const reader = BufferedFileReader.create(tempFile, {

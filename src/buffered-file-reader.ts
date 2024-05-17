@@ -120,7 +120,7 @@ export class BufferedFileReader {
     try {
       if (!this.#handle) await this.#openFileHandle();
       this.#mapExitHandlers();
-      let next: Buffer | null = null;
+      let nextChunk: IteratorResult | null = null;
 
       do {
         // Ensure there haven't been any modifications
@@ -132,51 +132,16 @@ export class BufferedFileReader {
             `File '${this.#filePath}' has been modified while processing`,
           );
 
-        // The starting position of the cursor
-        const startingCursorPosition = this.#cursorPosition;
-
-        // Get the next chunk
-        next = await this.#readChunkAtOffset(this.#cursorPosition);
-
         // Done
-        if (next == null) return null;
+        nextChunk = await this.#readNextChunk(this.#cursorPosition);
+        if (!nextChunk) return null;
 
-        // Update the cursor position for the next iteration
-        const nextStartingCursorPosition = this.#cursorPosition + next.length;
-        this.#cursorPosition = nextStartingCursorPosition;
-
-        // Trim the separator if necessary
-        if (
-          this.#configuration.separator &&
-          this.#configuration.trimSeparator
-        ) {
-          next = this.#trimSeparator(next, this.#configuration.separator);
-        }
+        // Update the cursor position
+        this.#cursorPosition = nextChunk.chunkCursor.end;
 
         // Yield the current entry
-        yield {
-          chunkCursor: {
-            start: startingCursorPosition,
-            end: this.#cursorPosition,
-          },
-          data: next,
-          peekNext: async () => {
-            const peekChunk = await this.#readChunkAtOffset(
-              nextStartingCursorPosition,
-            );
-
-            if (!peekChunk) return null;
-
-            return {
-              chunkCursor: {
-                start: nextStartingCursorPosition,
-                end: nextStartingCursorPosition + peekChunk.length,
-              },
-              data: peekChunk,
-            };
-          },
-        };
-      } while (next != null);
+        yield nextChunk;
+      } while (nextChunk != null);
     } finally {
       // Finally is called in the following events:
       // - The return above is called
@@ -187,6 +152,34 @@ export class BufferedFileReader {
     }
 
     return null;
+  }
+
+  /**
+   * Reads the next chunk from the specified cursor position
+   *
+   * @param cursorStart  The cursor position
+   * @returns            The chnunk or NULL if no further chunks could be read
+   */
+  async #readNextChunk(cursorStart: number): Promise<IteratorResult | null> {
+    let nextChunk = await this.#readChunkAtOffset(cursorStart);
+    if (nextChunk == null) return null;
+
+    const cursorEnd = cursorStart + nextChunk.length;
+
+    // Trim the separator if necessary
+    if (this.#configuration.separator && this.#configuration.trimSeparator)
+      nextChunk = this.#trimSeparator(nextChunk, this.#configuration.separator);
+
+    return {
+      chunkCursor: { start: cursorStart, end: cursorEnd },
+      data: nextChunk,
+      peekNext: async () => {
+        const res = await this.#readNextChunk(cursorEnd);
+        if (!res) return null;
+        const { peekNext: _, ...ret } = res;
+        return ret;
+      },
+    };
   }
 
   /**

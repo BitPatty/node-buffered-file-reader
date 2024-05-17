@@ -1,6 +1,6 @@
 {
   "name": "@bitpatty/buffered-file-reader",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A NodeJS library for reading a file in buffered chunks",
   "author": "Matteias Collet <matteias.collet@bluewin.ch>",
   "type": "module",

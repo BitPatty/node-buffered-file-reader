@@ -4,12 +4,7 @@
     "node": true,
     "es6": true
   },
-  "ignorePatterns": [
-    "coverage/**",
-    "dist/**",
-    "scripts/**",
-    "**/*.sh"
-  ],
+  "ignorePatterns": ["coverage/**", "dist/**", "scripts/**", "**/*.sh"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -22,11 +17,7 @@
     "project": "./tsconfig.json",
     "tsconfigRootDir": "./"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "jest",
-    "prettier"
-  ],
+  "plugins": ["@typescript-eslint", "jest", "prettier"],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": [
       "error",
@@ -35,27 +26,20 @@
         "allowConciseArrowFunctionExpressionsStartingWithVoid": true
       }
     ],
-    "@typescript-eslint/no-floating-promises": [
-      "error"
-    ],
-    "@typescript-eslint/no-shadow": [
-      "error"
-    ],
-    "@typescript-eslint/explicit-member-accessibility": [
-      "error"
-    ],
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/no-shadow": "error",
+    "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/no-unused-vars": [
-      "error"
+      "error",
+      {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
     ],
-    "no-console": [
-      "error"
-    ],
-    "no-return-await": [
-      "error"
-    ],
-    "require-await": [
-      "error"
-    ],
+    "no-console": "error",
+    "no-return-await": "error",
+    "require-await": "error",
     "padding-line-between-statements": [
       "error",
       {
@@ -82,17 +66,13 @@
   },
   "overrides": [
     {
-      "files": [
-        "*.spec.ts"
-      ],
+      "files": ["*.spec.ts"],
       "env": {
         "jest/globals": true
       }
     },
     {
-      "files": [
-        "test/**/*.js"
-      ],
+      "files": ["test/**/*.js"],
       "rules": {
         "@typescript-eslint/explicit-function-return-type": "off"
       }
