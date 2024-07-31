@@ -158,7 +158,7 @@ The following options can be passed as second argument when instantiating the re
   // This is especially useful when dealing with text files with
   // a delimiter (such as newlines). Note that the chunk size
   // configuration still applies for read operations. However,
-  // the returned buffer size may be lower or higher than the
+  // the returned buffer size may be less or greater than the
   // configured size, depending on where it encounters the
   // separator pattern.
   //
