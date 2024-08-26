@@ -39,7 +39,7 @@
     "@types/tmp": "0.2.6",
     "@typescript-eslint/eslint-plugin": "8.2.0",
     "@typescript-eslint/parser": "8.2.0",
-    "eslint": "9.9.0",
+    "eslint": "9.9.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-jest": "28.8.0",
     "eslint-plugin-prettier": "5.2.1",
@@ -48,9 +48,9 @@
     "rollup": "4.21.0",
     "rollup-plugin-typescript2": "0.36.0",
     "tmp": "0.2.3",
-    "ts-jest": "29.2.4",
+    "ts-jest": "29.2.5",
     "ts-node": "10.9.2",
-    "tslib": "2.6.3",
+    "tslib": "2.7.0",
     "typescript": "5.5.4",
     "wtfnode": "0.9.3"
   }
