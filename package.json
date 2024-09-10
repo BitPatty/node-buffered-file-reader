@@ -37,8 +37,8 @@
     "@types/jest": "29.5.12",
     "@types/node": "22.5.4",
     "@types/tmp": "0.2.6",
-    "@typescript-eslint/eslint-plugin": "8.4.0",
-    "@typescript-eslint/parser": "8.4.0",
+    "@typescript-eslint/eslint-plugin": "8.5.0",
+    "@typescript-eslint/parser": "8.5.0",
     "eslint": "9.10.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-jest": "28.8.3",
@@ -51,7 +51,7 @@
     "ts-jest": "29.2.5",
     "ts-node": "10.9.2",
     "tslib": "2.7.0",
-    "typescript": "5.5.4",
+    "typescript": "5.6.2",
     "wtfnode": "0.9.3"
   }
 }
