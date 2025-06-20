@@ -1,6 +1,6 @@
 # Buffered File Reader
 
-A NodeJS library for reading a file in buffered chunks, allowing you to await the processing of a chunk before reading the next one.
+A NodeJS library for reading a file in buffered chunks, allowing you to finish the processing of a chunk before reading the next one.
 
 ## Usage
 
