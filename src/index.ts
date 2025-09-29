@@ -2,9 +2,9 @@ import {
   BufferedFileReader,
   Iterator,
   IteratorResult,
-} from './buffered-file-reader';
-import { Configuration, ReaderOptions } from './configuration';
-import { Separator } from './separator';
+} from './buffered-file-reader.js';
+import { Configuration, ReaderOptions } from './configuration.js';
+import { Separator } from './separator.js';
 
 const createReader = (filePath: string, options?: ReaderOptions): Iterator =>
   BufferedFileReader.create(filePath, options);

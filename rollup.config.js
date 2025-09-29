@@ -48,6 +48,9 @@ export default [
           compilerOptions: {
             declaration: true,
             declarationDir: dirname(pkg.types),
+            paths: {
+              tslib: ['./node_modules/tslib/tslib.d.ts'],
+            },
           },
         },
       }),

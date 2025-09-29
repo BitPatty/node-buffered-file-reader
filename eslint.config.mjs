@@ -1,107 +1,160 @@
-import typescriptEslint from "@typescript-eslint/eslint-plugin";
-import jest from "eslint-plugin-jest";
-import prettier from "eslint-plugin-prettier";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
+import globals from 'globals';
+
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import js from '@eslint/js';
+import { FlatCompat } from '@eslint/eslintrc';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
 });
 
-export default [{
-    ignores: [
-        "coverage/**/*",
-        "dist/**/*",
-        "scripts/**/*",
-        "**/*.sh",
-        "coverage/**/*",
-        "dist/**/*",
-        "scripts/**/*",
-        "**/*.sh",
-        "**/rollup.config.js",
-    ],
-}, ...compat.extends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:jest/recommended",
-    "plugin:prettier/recommended",
-), {
-    plugins: {
-        "@typescript-eslint": typescriptEslint,
-        jest,
-        prettier,
-    },
-
+export default [
+  {
+    ignores: ['eslint.config.mjs'],
+  },
+  ...compat.extends(
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+  ),
+  {
+    plugins: { '@typescript-eslint': typescriptPlugin },
     languageOptions: {
-        globals: {
-            ...globals.node,
-        },
-
-        parser: tsParser,
-        ecmaVersion: 5,
-        sourceType: "commonjs",
-
-        parserOptions: {
-            project: "./tsconfig.json",
-            tsconfigRootDir: "./",
-        },
+      globals: { ...globals.node, ...globals.jest },
+      parserOptions: { project: 'tsconfig.json', tsConfigRootDir: './' },
     },
     rules: {
-        "@typescript-eslint/explicit-function-return-type": ["error", {
-            allowExpressions: true,
-            allowConciseArrowFunctionExpressionsStartingWithVoid: true,
-        }],
+      /******************************************************************
+       * Async / Promises
+       ******************************************************************/
 
-        "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-shadow": "error",
-        "@typescript-eslint/explicit-member-accessibility": "error",
+      // Don't allow a function to be async if there's no await
+      'require-await': 'error',
 
-        "@typescript-eslint/no-unused-vars": ["error", {
-            args: "all",
-            argsIgnorePattern: "^_",
-            varsIgnorePattern: "^_",
-        }],
+      // Don't allow returning await statements
+      'no-return-await': 'error',
 
-        "no-console": "error",
-        "no-return-await": "error",
-        "require-await": "error",
+      // Prevent unreachable code
+      'no-unreachable': 'error',
 
-        "padding-line-between-statements": ["error", {
-            blankLine: "always",
-            prev: "*",
-            next: "function",
-        }],
+      // Don't allow awaiting calls that are not thenable
+      // (such as example promises)
+      '@typescript-eslint/await-thenable': 'error',
 
-        "prettier/prettier": ["error", {}, {
-            usePrettierrc: true,
-        }],
+      // Don't allow floating promises (missing awaits)
+      '@typescript-eslint/no-floating-promises': 'error',
 
-        // "valid-jsdoc": ["error", {
-        //     requireReturn: false,
-        //     requireReturnType: false,
-        //     requireParamType: false,
-        // }],
-    },
-}, {
-    files: ["**/*.spec.ts"],
+      // Prevent promises from being used ad illogical locations
+      // such as in if statements, as this is usually forgetting an await
+      '@typescript-eslint/no-misused-promises': 'error',
 
-    languageOptions: {
-        globals: {
-            ...jest.environments.globals.globals,
+      /******************************************************************
+       * Classes
+       ******************************************************************/
+
+      // Always declare accessibility of class members (public, private, ...)
+      '@typescript-eslint/explicit-member-accessibility': 'error',
+
+      // Don't allow unused methods/attributes in classes
+      // that are not public
+      'no-unused-private-class-members': 'error',
+
+      /******************************************************************
+       * Misc
+       ******************************************************************/
+
+      // Require triple equals
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+
+      // Always require a return type on methods
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        {
+          allowExpressions: true,
+          allowConciseArrowFunctionExpressionsStartingWithVoid: true,
         },
+      ],
+
+      // Don't allow for..in loops (should generally be for..of)
+      '@typescript-eslint/no-for-in-array': 'error',
+
+      // Warn when working with deprecated code
+      '@typescript-eslint/no-deprecated': 'error',
+
+      // Don't require explicit argument typings but warn if they
+      // have not been provided
+      '@typescript-eslint/explicit-module-boundary-types': 'warn',
+
+      // Don't allow the use of `any`
+      '@typescript-eslint/no-explicit-any': 'off',
+
+      // Ensure all cases are handled in a switch
+      '@typescript-eslint/switch-exhaustiveness-check': [
+        'error',
+        { considerDefaultExhaustiveForUnions: true },
+      ],
+
+      // Require strict equality check except for null cheks
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
+
+      // Don't allow shadowing of variables (i.e. redeclaring a
+      // variable with the same name)
+      '@typescript-eslint/no-shadow': 'error',
+
+      // Only allow toString to be called on values where
+      // it makes sense
+      '@typescript-eslint/no-base-to-string': 'error',
+
+      // Require variable initialization
+      // Only use the typescript-eslint version
+      'init-declarations': 'off',
+      '@typescript-eslint/init-declarations': 'error',
+
+      // Don't allow unused variables unless they start with _
+      // Only use the typescript-eslint version
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { args: 'all', argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+
+      // Don't allow unused expressions unless they start with _
+      // Only use typescript-eslint version
+      'no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'error',
+
+      // Don't allow ts-comments
+      '@typescript-eslint/ban-ts-comment': 'error',
     },
-}, {
-    files: ["test/**/*.js"],
+  },
+  {
+    files: ['test/**'],
     rules: {
-        "@typescript-eslint/explicit-function-return-type": "off",
+      // Allow non-null assertions in test files
+      '@typescript-eslint/no-non-null-assertion': 'off',
+
+      // Don't require intialization in test files
+      'init-declarations': 'off',
+      '@typescript-eslint/init-declarations': 'off',
     },
-}];
+  },
+  {
+    files: ['mock-server/**'],
+    rules: {
+      // Allow non-boolan statements
+      '@typescript-eslint/strict-boolean-expressions': 'off',
+
+      // Allow returning promises where no promises are expected
+      '@typescript-eslint/no-misused-promises': 'off',
+    },
+  },
+];

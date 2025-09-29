@@ -11,7 +11,7 @@ declare global {
   namespace jest {
     // eslint-disable-next-line
     interface Matchers<R> {
-      toMatchChunks(expected: string[]): jest.CustomMatcherResult;
+      toMatchChunks(expected: string[]): Promise<jest.CustomMatcherResult>;
     }
   }
 }

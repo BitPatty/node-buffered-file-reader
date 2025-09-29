@@ -1,7 +1,7 @@
 import { watchFile, unwatchFile, StatsListener } from 'fs';
 import { FileHandle, open } from 'fs/promises';
 
-import { Configuration, ReaderOptions } from './configuration';
+import { Configuration, ReaderOptions } from './configuration.js';
 
 export type IteratorResult = {
   /**
@@ -89,6 +89,7 @@ export class BufferedFileReader {
    */
   private constructor(filePath: string, config: Configuration) {
     this.#filePath = filePath;
+    this.#isStarted = false;
     this.#configuration = config;
     this.#cursorPosition = config.startOffset;
   }
@@ -119,7 +120,6 @@ export class BufferedFileReader {
 
     try {
       if (!this.#handle) await this.#openFileHandle();
-      this.#mapExitHandlers();
       let nextChunk: IteratorResult | null = null;
 
       do {
@@ -315,29 +315,8 @@ export class BufferedFileReader {
     if (!this.#handle) throw new Error('Handle not opened');
     const buffer = Buffer.alloc(length, 0);
     const res = await this.#handle.read(buffer, 0, length, offset);
-    if (res.bytesRead == 0) return null;
+    if (res.bytesRead === 0) return null;
     return res.buffer.subarray(0, res.bytesRead);
-  }
-
-  /**
-   * Maps the processes process exit handlers, making sure
-   * that open handles are closed properly
-   */
-  #mapExitHandlers(): void {
-    process.on('exit', async () => {
-      await this.#dispose();
-      process.exit();
-    });
-
-    process.on('SIGINT', async () => {
-      await this.#dispose();
-      process.exit();
-    });
-
-    process.on('SIGTERM', async () => {
-      await this.#dispose();
-      process.exit();
-    });
   }
 
   /**

@@ -3,7 +3,6 @@
     "outDir": "dist",
     "module": "ESNext",
     "target": "ES2022",
-    "moduleResolution": "node",
     "allowJs": false,
     "declaration": true,
     "emitDeclarationOnly": false,
@@ -14,7 +13,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "sourceMap": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "strict": true
   },
   "include": ["src/**/*", "test/**/*", "./*.ts"],
   "exclude": ["node_modules", "dist", "rollup.config.js"]
